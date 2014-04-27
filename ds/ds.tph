@@ -27,7 +27,7 @@
 OUTER_SPRINT path ~mymod/ds_folder~ // change it to your mod folder
 INCLUDE ~%path%/ds.tph~
 LAF detectable_spells_setup STR_VAR path END
-LAF detectable_spells STR_VAR table=~%path%/cddetect.2da~ END
+LAF detectable_spells STR_VAR path table = ~cddetect.2da~ END
 */
 //
 // Advanced options:
