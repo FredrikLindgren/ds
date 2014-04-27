@@ -1,9 +1,9 @@
 
 
 // Detectable Spells v3
-// 
+//
 // Assembled by Ardanis/GeN1e, using DavidW's version (SCS) as a base
-// 
+//
 // Changes from previous version (SCS):
 //  - if Khelben's Warding Whip is broken, we first will attempt to repair it
 //  - removing older Ascension version of DS is less destructive
@@ -13,14 +13,14 @@
 //  - removed EFF-patching, it is not being used anywhere anyway
 //  - removed ~134 LEVELDRAIN~ stat, until somebody shows me a live example of the 200th stat NOT working
 //  - new ToBEx stats may be added on the fly, similar to how ADD_SPELL WeiDU command works (suggested by i30817 and aigleborgne)
-// 
+//
 // Contents (don't change any, unless you're the next update maintainer!!!):
 //   ds.tph
 //   spwi705.spl
 //   stats.2da
 //   fix_old_ds.2da
 //   old_ds_swap.2da
-// 
+//
 // Usage (basic):
 //   copypaste code below into your TP2, and set the path to match the directory
 /*
@@ -29,7 +29,7 @@ INCLUDE ~%path%/ds.tph~
 LAF detectable_spells_setup STR_VAR path END
 LAF detectable_spells STR_VAR table=~%path%/cddetect.2da~ END
 */
-// 
+//
 // Advanced options:
 //   1) table's format is:
 //        FILE - which file (SPL or ITM) you want patched
@@ -43,18 +43,18 @@ LAF detectable_spells STR_VAR table=~%path%/cddetect.2da~ END
 //                     "g" - global (equipped) effects
 //                     "a" - all ability headers
 //                     if you want only specific header patched, set PATCH_WHAT to that header's index (starting from 0)
-// 
+//
 //   2) you can launch the second macro multiple times with different tables (change path, if required)
-// 
+//
 //   3) you can use stats' ID names in your table instead of fixed values; to avoid compatibility issues with other ToBEx-using mods,
 //      consider using only strings (with your personal modder's prefix) for ToBEx stats, rather than values - DS then will find the
 //      lowerest unclaimed 400+ slot in STATS.IDS and use it for further patching
-// 
+//
 //   4) you can update painlessly spells with ticking effects (Khelben's Whip, clouds) - change the letter in "tick" column to a value;
 //      DS will find the effect with the longest delay and use it for the cloning purpose, your value will be added to the total duration;
 //      non-zero values may be required in cases when the spell only has one effect in header and relies on the projectile to apply it
 //      multiple times (clouds)
-// 
+//
 //   5) if you have altered some spells, so that their duration can no longer be correctly detected by the opcode in "clone" column, you
 //      must update the "ag#dsalt.2da" table in the "override" folder, to let other mods know of your changes; if you don't, those mods will
 //      erroneously assume that the spell's detection is invalid and delete it; this is how we'd proceed with the Spell Shield fix (SCS):
@@ -65,16 +65,16 @@ LAF ds_altered_spell INT_VAR old_clone=226 new_clone=142 STR_VAR file=~spwi519.s
 /*
 LAF detectable_weapon_enchantment END
 */
-// 
-// 
-// 
+//
+//
+//
 
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
 
 // Tightly based on Nythrun's ~fj_spl_itm_reindex~ patch library
-// 
+//
 // - wrapped into patch function
 // - added the missing ~WRITE_SHORT 0x6e 0~ line
 // - added SOURCE_SIZE check
@@ -168,7 +168,7 @@ END // end of function
 //////////////////////////////////////////////////////////////////////////////////////
 
 // Core patch
-// 
+//
 // Now using intelligent compatibility-friendly check:
 //   we start by looking for existing 233/282 (with parameters matching CDDETECT.2DA) and opcode-to-be-detected
 //   - if both are present, we check if 233/282 has correct settings (timing, power, etc.)
@@ -177,7 +177,7 @@ END // end of function
 //   - if o-t-b-d is present and 233/282 is not, we generate new effect via cloning o-t-b-d
 //   - if 233/282 is present and o-t-b-d is not, we delete 233/282
 //   - if neither is present, we do nothing
-// 
+//
 // New features:
 //   - we allow for spells to have been changed by mods and use a different duration marker opcode (aka 'clone') than stated in %table%
 //   - you can define stats in %table% by their ID names rather than values (case insensitive)
@@ -426,12 +426,12 @@ COPY_EXISTING ~spwi705.spl~ override
         READ_SHORT ef_off+ef_ind*0x30 opcode
         READ_LONG ef_off+ef_ind*0x30+4 par1
         READ_LONG ef_off+ef_ind*0x30+8 par2
-        PATCH_IF (opcode!=233 || par1!=1 || par2!=132) // 
-              && (opcode!=233 || par1!=0 || par2!=116) // 
-              && (opcode!=233 || par1!=0 || par2!=129) // 
-              && (opcode!=282 || par1!=0 || par2!=5)   // 
-              && (opcode!=282 || par1!=0 || par2!=7)   // 
-              && (opcode!=282 || par1!=0 || par2!=21)  // 
+        PATCH_IF (opcode!=233 || par1!=1 || par2!=132) //
+              && (opcode!=233 || par1!=0 || par2!=116) //
+              && (opcode!=233 || par1!=0 || par2!=129) //
+              && (opcode!=282 || par1!=0 || par2!=5)   //
+              && (opcode!=282 || par1!=0 || par2!=7)   //
+              && (opcode!=282 || par1!=0 || par2!=21)  //
         BEGIN
           fubar=1
           PATCH_PRINT ~SPWI705.SPL is broken in unknown manner, restoring from a backup~
@@ -467,12 +467,12 @@ COPY_EXISTING ~spwi705.spl~ override
           READ_SHORT ef_off+(k+ef_ind+local_delta)*0x30 opcode
           READ_LONG ef_off+(k+ef_ind+local_delta)*0x30+4 par1
           READ_LONG ef_off+(k+ef_ind+local_delta)*0x30+8 par2
-          PATCH_IF (opcode=233 && par1=1 && par2=132) // 
-                || (opcode=233 && par1=0 && par2=116) // 
-                || (opcode=233 && par1=0 && par2=129) // 
-                || (opcode=282 && par1=0 && par2=5)   // 
-                || (opcode=282 && par1=0 && par2=7)   // 
-                || (opcode=282 && par1=0 && par2=21)  // 
+          PATCH_IF (opcode=233 && par1=1 && par2=132) //
+                || (opcode=233 && par1=0 && par2=116) //
+                || (opcode=233 && par1=0 && par2=129) //
+                || (opcode=282 && par1=0 && par2=5)   //
+                || (opcode=282 && par1=0 && par2=7)   //
+                || (opcode=282 && par1=0 && par2=21)  //
           BEGIN
             DELETE_BYTES ef_off+(k+ef_ind+local_delta)*0x30 0x30
             delta -=1
@@ -730,7 +730,7 @@ COPY - ~%path%/fix_old_ds.2da~ ~override~
     READ_2DA_ENTRY_FORMER row t 6 new_p2
     READ_2DA_ENTRY_FORMER row t 7 type
 
-    INNER_ACTION BEGIN ACTION_IF FILE_EXISTS_IN_GAME EVAL ~%file%~ BEGIN 
+    INNER_ACTION BEGIN ACTION_IF FILE_EXISTS_IN_GAME EVAL ~%file%~ BEGIN
       COPY_EXISTING ~%file%~ ~override~ LPF ag_spl_itm_validity RET valid=valid END PATCH_IF valid BEGIN
 
         READ_LONG  0x64 ab_off
@@ -902,23 +902,3 @@ END // end of function
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

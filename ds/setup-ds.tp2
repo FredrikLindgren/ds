@@ -48,15 +48,3 @@ sppr717b.spl   233     3     120   54     n     a          //  Creeping Doom
 LAF detectable_spells STR_VAR path=~...inlined/ds~ table = ~my_table.2da~ END
 
 /////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
