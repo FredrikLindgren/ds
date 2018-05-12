@@ -354,6 +354,8 @@ DEFINE_PATCH_MACRO ds_eval BEGIN
     END
   END
 
+  SORT_ARRAY_INDICES auxil NUMERICALLY
+
   // insert or delete data
   local_delta=0
   PHP_EACH auxil AS ind => res BEGIN
